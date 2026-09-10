@@ -1,0 +1,37 @@
+// Uzbek (yangi lotin alifbosi, Q joylashuvi) — XKB symbols fayli
+//
+// 2026-yilgi alifbo islohotiga ko'ra kiritilayotgan Ö, Ğ, Ş, Ç harflari
+// standart QWERTY klaviaturaning bo'sh/kam ishlatiladigan tugmalariga
+// joylashtirilgan:
+//
+//   [  ->  Ö / Ö   (AD11)
+//   ]  ->  Ğ / ğ   (AD12)
+//   ;  ->  Ş / ş   (AC10)
+//   '  ->  Ç / ç   (AC11)
+//   `  ->  ʼ (tutuq belgisi, U+02BC) / ~  (TLDE)
+//
+// Shift bosilganda bosh harflar, chap Ctrl (Level3) bosilganda esa eski
+// belgilar ([ ] ; ' ` ) hamon mavjud bo'lib qoladi.
+
+xkb_symbols "basic" {
+    include "us(basic)"
+    name[Group1] = "New Uzbek (Latin)";
+
+    key <TLDE> { [ U02BC,       asciitilde,  grave,        grave      ] }; // ʼ tutuq belgisi
+    key <AD11> { [ odiaeresis,  Odiaeresis,  bracketleft,  braceleft  ] }; // Ö
+    key <AD12> { [ gbreve,      Gbreve,      bracketright, braceright ] }; // Ğ
+    key <AC10> { [ scedilla,    Scedilla,    semicolon,    colon      ] }; // Ş
+    key <AC11> { [ ccedilla,    Ccedilla,    apostrophe,   quotedbl   ] }; // Ç
+
+    // Chap Ctrl tugmasini 3-daraja (level3) almashtirgichi sifatida
+    // faollashtiradi (chap Alt o'rniga — u Alt+Tab, Alt+F4 kabi tizim
+    // yorliqlarini buzgani uchun). Shu qator bo'lmasa, yuqoridagi
+    // 3- va 4-darajadagi eski belgilar ([ ] ; ' `) hech qanday tugma bilan
+    // yetib bo'lmaydigan holda qoladi.
+    //
+    // DIQQAT: chap Ctrl shu bilan "level3 shifter"ga aylanadi. Odatda
+    // Ctrl+C, Ctrl+V kabi qisqa yo'llar chap Ctrl alohida ushlab turilib,
+    // boshqa tugma bosilganda ishlayveradi, shuning uchun bular buzilmasligi
+    // kerak — lekin biror muammo sezsangiz xabar bering.
+    include "level3(ralt_switch)"
+};
