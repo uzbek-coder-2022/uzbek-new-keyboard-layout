@@ -1,0 +1,20 @@
+# register-name.sh tomonidan yaratiladigan zaxira fayllar
+*.bak
+
+# Python
+__pycache__/
+*.pyc
+
+# Matn muharrirlari va IDE fayllari
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS tomonidan avtomatik yaratiladigan fayllar
+.DS_Store
+Thumbs.db
+
+# Log fayllar (agar test paytida yaratilsa)
+*.log
