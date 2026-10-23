@@ -15,6 +15,7 @@
 
 set -e
 LIB="/usr/share/uzbek-keyboard"
+[ -d "$LIB" ] || LIB="/usr/local/share/uzbek-keyboard"
 AUTOSTART="$HOME/.config/autostart/uz-keyboard.desktop"
 SCHEMA="org.gnome.desktop.input-sources"
 

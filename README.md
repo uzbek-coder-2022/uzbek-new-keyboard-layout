@@ -51,7 +51,11 @@ uzbek-new-keyboard-layout/
 │   ├── uninstall.sh             # o'chirish   (basic | cw | all)
 │   ├── register-name.sh         # GNOME Settings'da chiroyli nom
 │   ├── uz-keyboard-gui.py       # o'rnatish/o'chirish oynasi (GTK3)
-│   ├── deb/                     # .deb paket manbalari (build-deb.sh, postinst, templates ...)
+│   ├── deb/                     # .deb manbalari (build-deb.sh, postinst, templates, uzbek-keyboard)
+│   ├── rpm/                     # .rpm manbalari (spec, build-rpm.sh)
+│   ├── arch/                    # PKGBUILD (Arch/Manjaro)
+│   ├── Makefile                 # umumiy `make install` (DESTDIR/PREFIX)
+│   ├── build-tarball.sh         # hamma distro uchun .tar.gz
 │   └── lib/
 │       ├── common.sh
 │       └── xkb_register.py
@@ -186,6 +190,25 @@ Paket `/usr/share/X11/xkb/symbols/uzq` ni o'rnatadi, GNOME Settings uchun chiroy
 ro'yxatdan o'tkazadi (xkb-data yangilanganda trigger orqali qayta yoziladi) va
 `sudo apt remove uzbek-new-keyboard-layout` qilinganda hammasini tozalaydi.
 Yig'ish: `bash linux/deb/build-deb.sh [versiya]` → `linux/dist/*.deb`.
+
+### Boshqa distrolar
+
+| Distro | Paket | O'rnatish |
+|---|---|---|
+| Ubuntu, Debian, Mint, Pop!_OS | `.deb` | `sudo apt install ./uzbek-new-keyboard-layout_2.0.0_all.deb` |
+| Fedora, RHEL, Rocky, Alma | `.rpm` | `sudo dnf install ./uzbek-new-keyboard-layout-2.0.0-1.noarch.rpm` |
+| openSUSE | `.rpm` | `sudo zypper install ./uzbek-new-keyboard-layout-2.0.0-1.noarch.rpm` |
+| Arch, Manjaro, EndeavourOS | `PKGBUILD` | `cd linux/arch && makepkg -si` |
+| Boshqa (Gentoo, Void, Alpine ...) | `.tar.gz` | `tar xzf uzbek-new-keyboard-layout-2.0.0-linux.tar.gz && cd uzbek-new-keyboard-layout-2.0.0 && sudo make -C linux install` |
+
+`.deb` o'rnatishda qaysi variant yoqilishini so'raydi. Boshqa paketlarda variant o'rnatgandan keyin
+tanlanadi: `uzbek-keyboard enable basic|cw|all` yoki `uzbek-keyboard gui`.
+Hammasi `make install` ga tayanadi (`DESTDIR`, `PREFIX` qo'llab-quvvatlanadi; XKB fayli doim
+`/usr/share/X11/xkb` ga tushadi). Yig'ish: `linux/deb/build-deb.sh`, `linux/rpm/build-rpm.sh`,
+`linux/build-tarball.sh`.
+
+> **KDE Plasma:** `uzbek-keyboard enable` faqat GNOME va `setxkbmap` uchun. KDE'da paketni o'rnating,
+> so'ng System Settings → Keyboard → Layouts → Add → *Uzbek* → *New Uzbek (Latin)* (yoki "- C/W") ni tanlang.
 
 ### O'rnatish — oyna orqali
 

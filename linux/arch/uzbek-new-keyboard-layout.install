@@ -1,0 +1,10 @@
+post_install() {
+    /usr/bin/uzbek-keyboard register >/dev/null 2>&1 || true
+    echo "Uzbek keyboard: yoqish uchun ->  uzbek-keyboard enable basic|cw|all   (yoki: uzbek-keyboard gui)"
+}
+post_upgrade() {
+    /usr/bin/uzbek-keyboard register >/dev/null 2>&1 || true
+}
+pre_remove() {
+    /usr/bin/uzbek-keyboard unregister >/dev/null 2>&1 || true
+}

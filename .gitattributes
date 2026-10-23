@@ -11,3 +11,8 @@ uzq      text eol=lf
 *.deb    binary
 *.exe    binary
 *.dll    binary
+*.deb    binary
+*.rpm    binary
+*.exe    binary
+*.dll    binary
+*.gz     binary

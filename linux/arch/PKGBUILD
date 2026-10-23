@@ -1,0 +1,22 @@
+# Maintainer: Uzbek keyboard layout <noreply@example.com>
+pkgname=uzbek-new-keyboard-layout
+pkgver=2.0.0
+pkgrel=1
+pkgdesc='New Uzbek (Latin) keyboard layouts (Ö Ğ Ş Ç ʼ): Q and C/W variants'
+arch=('any')
+url='https://github.com/uzbek-coder-2022/uzbek-new-keyboard-layout'
+license=('MIT')
+depends=('python' 'xkeyboard-config')
+optdepends=('python-gobject: GTK window (uzbek-keyboard gui)'
+            'gtk3: GTK window (uzbek-keyboard gui)'
+            'xorg-setxkbmap: non-GNOME desktops')
+install=$pkgname.install
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')   # chiqarishdan keyin: updpkgsums
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    make -C linux install DESTDIR="$pkgdir" PREFIX=/usr
+    install -Dm0644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    rm -rf "$pkgdir/usr/share/doc/$pkgname"
+}
