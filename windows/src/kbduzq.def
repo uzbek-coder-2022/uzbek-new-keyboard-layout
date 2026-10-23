@@ -1,0 +1,3 @@
+LIBRARY KBDUZQ
+EXPORTS
+    KbdLayerDescriptor @1

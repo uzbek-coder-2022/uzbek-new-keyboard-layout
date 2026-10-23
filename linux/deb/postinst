@@ -1,0 +1,42 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+
+target_users() {
+    if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then echo "$SUDO_USER"; return; fi
+    if [ -n "$PKEXEC_UID" ]; then id -nu "$PKEXEC_UID" 2>/dev/null; return; fi
+    if command -v loginctl >/dev/null 2>&1; then
+        loginctl list-sessions --no-legend 2>/dev/null | awk '{print $3}' | sort -u | grep -vx root || true
+    fi
+}
+
+case "$1" in
+    configure)
+        db_input medium uzbek-new-keyboard-layout/variants || true
+        db_go || true
+        db_get uzbek-new-keyboard-layout/variants
+        VARIANTS="$(echo "$RET" | tr -d ',')"
+
+        # GNOME Settings'da chiroyli nom (tizim darajasida)
+        /usr/bin/uzbek-keyboard register || true
+
+        # Tanlangan variantlarni o'rnatayotgan foydalanuvchi uchun yoqish
+        for u in $(target_users); do
+            uid="$(id -u "$u" 2>/dev/null)" || continue
+            bus="/run/user/$uid/bus"
+            for v in $VARIANTS; do
+                if [ -S "$bus" ]; then
+                    runuser -u "$u" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+                        DBUS_SESSION_BUS_ADDRESS="unix:path=$bus" \
+                        /usr/bin/uzbek-keyboard enable "$v" || true
+                fi
+            done
+        done
+        echo "Uzbek keyboard: tanlangan variantlar: ${VARIANTS:-yo'q}. O'zgartirish: uzbek-keyboard gui"
+        ;;
+    triggered)
+        # xkb-data yangilanganda nomlar yo'qolmasligi uchun qayta yozamiz
+        /usr/bin/uzbek-keyboard register || true
+        ;;
+esac
+exit 0

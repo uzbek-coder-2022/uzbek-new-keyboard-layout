@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 evdev.xml / base.xml fayliga yangi <layout> yozuvini qo'shadi, shunda
-GNOME Settings da klaviatura layouti texnik "uzq+basic" nomi o'rniga
-o'qilishi qulay nom bilan ko'rinadi.
+GNOME Settings da klaviatura layoutlari texnik "uzq+basic" / "uzq+cw" nomi
+o'rniga o'qilishi qulay nom bilan ko'rinadi (ikkala variant bitta <layout>
+ichida ro'yxatdan o'tadi).
 
 Agar "uzq" yozuvi faylda allaqachon mavjud bo'lsa, uni o'chirib
 tashlamasdan, ichidagi nomni (description) yangi nomga yangilaydi.
@@ -16,6 +17,20 @@ import sys
 
 
 def build_block(desc):
+    variants = (
+        ("basic", desc),
+        ("cw", desc + " - C/W"),
+    )
+    items = ""
+    for name, text in variants:
+        items += (
+            "      <variant>\n"
+            "        <configItem>\n"
+            "          <name>" + name + "</name>\n"
+            "          <description>" + text + "</description>\n"
+            "        </configItem>\n"
+            "      </variant>\n"
+        )
     return (
         "  <layout>\n"
         "    <configItem>\n"
@@ -27,18 +42,33 @@ def build_block(desc):
         "      </languageList>\n"
         "    </configItem>\n"
         "    <variantList>\n"
-        "      <variant>\n"
-        "        <configItem>\n"
-        "          <name>basic</name>\n"
-        "          <description>" + desc + "</description>\n"
-        "        </configItem>\n"
-        "      </variant>\n"
+        + items +
         "    </variantList>\n"
         "  </layout>\n"
     )
 
 
+def remove(path):
+    """XKB reestridan "uzq" <layout> blokini olib tashlaydi (paketni o'chirishda)."""
+    with open(path, "r", encoding="utf-8") as fh:
+        content = fh.read()
+    block_re = re.compile(
+        r"  <layout>\n(?:(?!</layout>).)*?<name>uzq</name>(?:(?!</layout>).)*?  </layout>\n",
+        re.DOTALL,
+    )
+    new_content, n = block_re.subn("", content)
+    if n:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(new_content)
+        print("Olib tashlandi: " + path)
+    else:
+        print("O'tkazib yuborildi (yozuv yo'q): " + path)
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--remove":
+        remove(sys.argv[2])
+        return
     if len(sys.argv) != 3:
         print("Xato: 2 ta argument kerak: fayl_yoli va nom")
         sys.exit(1)

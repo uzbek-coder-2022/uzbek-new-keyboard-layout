@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# uzbek-keyboard — yangi o'zbek lotin klaviatura layoutlarini yoqish/o'chirish.
+# (.deb paketi bilan o'rnatiladi; root kerak emas — o'z foydalanuvchingiz uchun ishlaydi.)
+#
+#   uzbek-keyboard enable  basic|cw|all    layoutni input source ro'yxatiga qo'shish
+#   uzbek-keyboard disable basic|cw|all    ro'yxatdan olib tashlash
+#   uzbek-keyboard status                  holatni ko'rsatish
+#   uzbek-keyboard gui                     oynani ochish
+#   sudo uzbek-keyboard register           GNOME Settings uchun nomlarni qayta yozish
+#   sudo uzbek-keyboard unregister
+#
+# Variantlar:  basic = Q joylashuvi ([ ] ; ' -> ö ğ ş ç)
+#              cw    = C/W joylashuvi (c w ; , -> ç ş ö ğ)
+
+set -e
+LIB="/usr/share/uzbek-keyboard"
+AUTOSTART="$HOME/.config/autostart/uz-keyboard.desktop"
+SCHEMA="org.gnome.desktop.input-sources"
+
+is_gnome() {
+    command -v gsettings >/dev/null 2>&1 && gsettings list-schemas 2>/dev/null | grep -qx "$SCHEMA"
+}
+valid() { case "$1" in basic|cw|all) return 0 ;; *) return 1 ;; esac; }
+expand() { if [ "$1" = "all" ]; then echo "basic cw"; else echo "$1"; fi; }
+
+list_edit() {   # list_edit add|del <id>
+    local cur new
+    cur="$(gsettings get $SCHEMA sources)"
+    new="$(python3 - "$cur" "$1" "$2" << 'PY'
+import ast, sys
+cur = ast.literal_eval(sys.argv[1].replace("@a(ss) ", ""))
+item = ("xkb", sys.argv[3])
+if sys.argv[2] == "add":
+    if item not in cur:
+        cur.append(item)
+else:
+    cur = [s for s in cur if s != item] or [("xkb", "us")]
+print(cur)
+PY
+)"
+    gsettings set $SCHEMA sources "$new"
+}
+
+cmd_enable() {
+    valid "$1" || { echo "Foydalanish: uzbek-keyboard enable basic|cw|all"; exit 1; }
+    if is_gnome; then
+        for v in $(expand "$1"); do list_edit add "uzq+$v"; echo "yoqildi: uzq+$v"; done
+        echo "Super+Space bilan almashtiring (ko'rinmasa — seansdan chiqib qayta kiring)."
+    else
+        [ "$1" = "all" ] && { echo "GNOME bo'lmagan muhitda bir vaqtda bitta variant: basic yoki cw."; exit 1; }
+        setxkbmap -symbols "pc+us+uzq($1)"
+        mkdir -p "$(dirname "$AUTOSTART")"
+        printf '[Desktop Entry]\nType=Application\nExec=setxkbmap -symbols "pc+us+uzq(%s)"\nName=Uzbek Keyboard Layout (%s)\n' "$1" "$1" > "$AUTOSTART"
+        echo "yoqildi: uzq($1) (autostart: $AUTOSTART)"
+    fi
+}
+
+cmd_disable() {
+    valid "$1" || { echo "Foydalanish: uzbek-keyboard disable basic|cw|all"; exit 1; }
+    if is_gnome; then
+        for v in $(expand "$1"); do list_edit del "uzq+$v"; echo "o'chirildi: uzq+$v"; done
+    else
+        setxkbmap us || true
+        rm -f "$AUTOSTART"
+        echo "standart layoutga qaytarildi."
+    fi
+}
+
+cmd_status() {
+    for v in basic cw; do
+        if is_gnome; then
+            if gsettings get $SCHEMA sources | grep -qF "uzq+$v"; then s="yoqilgan"; else s="yoqilmagan"; fi
+        else
+            if grep -qs "uzq($v)" "$AUTOSTART"; then s="yoqilgan"; else s="yoqilmagan"; fi
+        fi
+        printf '%-6s %s\n' "$v" "$s"
+    done
+}
+
+need_root() { [ "$(id -u)" -eq 0 ] || { echo "Bu buyruq uchun sudo kerak."; exit 1; }; }
+
+cmd_register() {
+    need_root
+    for f in /usr/share/X11/xkb/rules/evdev.xml /usr/share/X11/xkb/rules/base.xml; do
+        [ -e "$f" ] && python3 "$LIB/xkb_register.py" "$f" "New Uzbek (Latin)"
+    done
+}
+cmd_unregister() {
+    need_root
+    for f in /usr/share/X11/xkb/rules/evdev.xml /usr/share/X11/xkb/rules/base.xml; do
+        [ -e "$f" ] && python3 "$LIB/xkb_register.py" --remove "$f"
+    done
+}
+
+case "$1" in
+    enable)     cmd_enable "$2" ;;
+    disable)    cmd_disable "$2" ;;
+    status)     cmd_status ;;
+    gui)        exec python3 "$LIB/uz-keyboard-gui.py" ;;
+    register)   cmd_register ;;
+    unregister) cmd_unregister ;;
+    *) sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

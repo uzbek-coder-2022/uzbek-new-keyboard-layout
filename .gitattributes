@@ -1,0 +1,13 @@
+*.sh     text eol=lf
+*.py     text eol=lf
+uzq      text eol=lf
+*.c      text eol=lf
+*.h      text eol=lf
+*.def    text eol=lf
+*.ps1    text eol=crlf
+*.bat    text eol=crlf
+*.klc    binary
+*.dll    binary
+*.deb    binary
+*.exe    binary
+*.dll    binary

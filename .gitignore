@@ -18,3 +18,8 @@ Thumbs.db
 
 # Log fayllar (agar test paytida yaratilsa)
 *.log
+
+# Python
+*.egg-info/
+
+# yig'ilgan paketlar (GitHub Releases ga yuklang)

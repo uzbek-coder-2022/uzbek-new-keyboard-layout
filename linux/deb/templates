@@ -1,0 +1,12 @@
+Template: uzbek-new-keyboard-layout/variants
+Type: multiselect
+Choices-C: basic, cw
+Choices: Q joylashuvi (basic), C/W joylashuvi (cw)
+Default: basic
+Description: Qaysi klaviatura layout(lar)i yoqilsin?
+ Q joylashuvi (basic): [ ] ; ' tugmalari -> ö ğ ş ç.
+ C/W joylashuvi (cw): c w ; vergul tugmalari -> ç ş ö ğ.
+ .
+ Ikkalasini ham belgilash mumkin. Keyin istalgan vaqtda
+ "uzbek-keyboard enable|disable basic|cw|all" yoki "uzbek-keyboard gui"
+ orqali o'zgartirish mumkin.

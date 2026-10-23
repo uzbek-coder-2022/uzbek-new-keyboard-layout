@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+case "$1" in
+    remove|deconfigure)
+        /usr/bin/uzbek-keyboard unregister || true
+        if command -v loginctl >/dev/null 2>&1; then
+            for u in $( [ -n "$SUDO_USER" ] && echo "$SUDO_USER" || loginctl list-sessions --no-legend 2>/dev/null | awk '{print $3}' | sort -u | grep -vx root); do
+                uid="$(id -u "$u" 2>/dev/null)" || continue
+                bus="/run/user/$uid/bus"
+                [ -S "$bus" ] && runuser -u "$u" -- env XDG_RUNTIME_DIR="/run/user/$uid" \
+                    DBUS_SESSION_BUS_ADDRESS="unix:path=$bus" /usr/bin/uzbek-keyboard disable all || true
+            done
+        fi
+        ;;
+esac
+exit 0

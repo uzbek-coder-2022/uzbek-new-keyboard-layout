@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Uzbek Keyboard Layout
+Name[uz]=O'zbek klaviatura layouti
+Comment=Yangi o'zbek lotin klaviatura layoutlarini yoqish/o'chirish
+Exec=uzbek-keyboard gui
+Icon=input-keyboard
+Terminal=false
+Categories=Settings;HardwareSettings;
